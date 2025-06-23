@@ -9,6 +9,6 @@ data class User(
     val name: String,
     val address: String,
     val phone: String,
-    val signature: String,     // base64 or filepath
-    val profilePic: String     // file path or URI
+    val signature: String,
+    val profilePic: String
 )
