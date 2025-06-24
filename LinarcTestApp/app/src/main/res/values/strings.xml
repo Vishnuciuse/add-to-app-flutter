@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">LinarcTestApp</string>
+    <string name="saved_successfully">Data Saved Successfully</string>
+    <string name="enter_values">Enter the values</string>
+    <string name="image_mime_type">image/*</string>
+    <string name="get_users">getUsers</string>
+    <string name="delete_user">deleteUser</string>
+    <string name="_id">id</string>
+    <string name="name">Name</string>
+    <string name="small_name">name</string>
+    <string name="address">Address</string>
+    <string name="small_address">address</string>
+    <string name="mobile">Mobile No</string>
+    <string name="phone">phone</string>
+    <string name="signature">signature</string>
+    <string name="profilePic">profilePic</string>
+    <string name="insert">Insert</string>
+    <string name="navigate">Navigate</string>
+    <string name="user_not_found">User not found</string>
+    <string name="shared_image_">shared_image_</string>
+    <string name="image">image_</string>
 </resources>

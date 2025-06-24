@@ -3,26 +3,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EntryActivity">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/uploadSIV"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_margin="80dp"
+        android:padding="5dp"
+        android:background="@drawable/person_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
+        app:strokeColor="@android:color/black"
+        app:strokeWidth="2dp" />
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:contentDescription="@string/image"
+        android:src="@drawable/baseline_edit"
+        app:layout_constraintBottom_toBottomOf="@+id/uploadSIV"
+        app:layout_constraintEnd_toEndOf="@+id/uploadSIV" />
 
     <EditText
         android:id="@+id/nameET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:hint="Name"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="60dp"
+        android:autofillHints=""
+        android:background="@drawable/edit_text_border"
+        android:hint="@string/name"
+        android:inputType="textPersonName"
+        android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/uploadSIV" />
 
     <EditText
         android:id="@+id/addressET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:hint="Address"
+        android:autofillHints=""
+        android:background="@drawable/edit_text_border"
+        android:hint="@string/address"
+        android:inputType="textPostalAddress"
+        android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nameET" />
@@ -32,53 +64,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:hint="Mobile No"
+        android:autofillHints=""
+        android:background="@drawable/edit_text_border"
+        android:hint="@string/mobile"
+        android:inputType="phone"
+        android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/addressET" />
 
-    <Button
-        android:id="@+id/displayBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Display"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/clickMeBtn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/clickMeBtn"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Insert"
+        android:layout_margin="16dp"
+        android:text="@string/insert"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/navMeBtn"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/mobileET" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/navMeBtn"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Navigate"
+        android:text="@string/navigate"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/clickMeBtn"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <TextView
-        android:id="@+id/dataListTV"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/clickMeBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/mobileET" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

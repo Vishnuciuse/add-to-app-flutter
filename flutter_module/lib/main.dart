@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
@@ -130,7 +131,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen>
           final user = users[index];
           return Card(
             child: ListTile(
-              leading: const Icon(Icons.person),
+              leading: Container(
+                width: 40,
+                height: 40,
+                child: Image.file(
+                  File(user.profilePic),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.person);
+                  },
+                ),
+              ),
               title: Text(user.name),
               subtitle: Text('${user.address} | ${user.phone}'),
               trailing: IconButton(

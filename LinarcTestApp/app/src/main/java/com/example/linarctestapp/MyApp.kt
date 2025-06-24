@@ -17,21 +17,16 @@ class MyApp : Application(), ViewModelStoreOwner {
     override fun onCreate() {
         super.onCreate()
 
-        // Init Flutter engine manually
         flutterEngine = FlutterEngine(this)
 
-        // Register method channel
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "user_channel")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, Constants.CHANNEL_NAME)
             .setMethodCallHandler { call, result ->
-                Log.d("vis@#$", "From MyApp check the call back triggers")
                 when (call.method) {
-                    "getUsers" -> {
-                        Log.d("vis@#$", "the user list ")
+                    getString(R.string.get_users) -> {
                     }
                 }
             }
 
-        // Pre-warm Flutter engine
         flutterEngine.navigationChannel.setInitialRoute("/")
         flutterEngine.dartExecutor.executeDartEntrypoint(
             DartExecutor.DartEntrypoint.createDefault()
