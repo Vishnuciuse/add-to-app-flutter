@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LinarcTestApp</string>
     <string name="saved_successfully">Data Saved Successfully</string>
-    <string name="enter_values">Enter the values</string>
+    <string name="enter_values">User Name is mandatory</string>
     <string name="image_mime_type">image/*</string>
     <string name="get_users">getUsers</string>
     <string name="delete_user">deleteUser</string>
@@ -18,5 +18,8 @@
     <string name="navigate">Navigate</string>
     <string name="user_not_found">User not found</string>
     <string name="shared_image_">shared_image_</string>
+    <string name="user_signature_">user_signature_</string>
+    <string name="signature_saved">Signature saved</string>
+    <string name="failed_to_save_signature">Failed to save signature</string>
     <string name="image">image_</string>
 </resources>

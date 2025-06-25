@@ -1,10 +1,14 @@
 package com.example.linarctestapp
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -13,6 +17,7 @@ import com.example.linarctestapp.data.User
 import com.example.linarctestapp.data.UserViewModel
 import com.example.linarctestapp.data.UserViewModelFactory
 import com.example.linarctestapp.databinding.ActivityEntryBinding
+import com.example.linarctestapp.ui.custom.SignatureView
 import com.example.linarctestapp.utils.Constants
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -26,6 +31,7 @@ class EntryActivity : FlutterActivity() {
     private lateinit var binding: ActivityEntryBinding
     private lateinit var viewModel: UserViewModel
     var imageUri: String? = null
+    var signUri: String? = null
 
     override fun provideFlutterEngine(context: Context): FlutterEngine {
         return FlutterEngineCache.getInstance().get(Constants.FLUTTER_ENGINE_ID)!!
@@ -58,8 +64,7 @@ class EntryActivity : FlutterActivity() {
                 binding.mobileET.text?.clear()
                 viewModel.resetInsertFlag()
                 clearFocusAndHideKeyboard()
-                Toast.makeText(this, getString(R.string.saved_successfully), Toast.LENGTH_LONG)
-                    .show()
+                toastMessage(getString(R.string.saved_successfully))
             }
         }
 
@@ -72,20 +77,62 @@ class EntryActivity : FlutterActivity() {
             startActivityForResult(intent, 101)
         }
 
+        binding.signBtn.setOnClickListener {
+           signatureDialog()
+        }
+
         binding.clickMeBtn.setOnClickListener {
             val userData = User(
                 0, binding.nameET.text.toString(), binding.addressET.text.toString(),
-                binding.mobileET.text.toString(), "", imageUri.toString()
+                binding.mobileET.text.toString(), signUri.toString(), imageUri.toString()
             )
             if (binding.nameET.text.toString().isNotEmpty()) // here only checking the name is mandatory, can add more validations
                 viewModel.insert(userData)
             else
-                Toast.makeText(this, getString(R.string.enter_values), Toast.LENGTH_LONG).show()
+                toastMessage(getString(R.string.enter_values))
         }
 
         binding.navMeBtn.setOnClickListener {
             startActivity(withCachedEngine(Constants.FLUTTER_ENGINE_ID).build(this))
         }
+    }
+
+    private fun signatureDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.signature_dialog, null)
+
+        val signatureView = dialogView.findViewById<SignatureView>(R.id.dialog_signature_view)
+        val clearButton = dialogView.findViewById<Button>(R.id.btn_clear)
+        val saveButton = dialogView.findViewById<Button>(R.id.btn_save)
+        val closeImage = dialogView.findViewById<ImageView>(R.id.closeIV)
+
+        val dialog = AlertDialog.Builder(this,  androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        clearButton.setOnClickListener {
+            signatureView.clearSignature()
+        }
+
+        saveButton.setOnClickListener {
+            val signatureBitmap = signatureView.getSignatureBitmap()
+            binding.viewSignIV.setImageBitmap(signatureBitmap)
+            val file = saveSignatureToCache(signatureBitmap)
+            println("the sign uri@#$"+file!!.absolutePath.toString())
+            if (file != null) {
+                signUri = file.absolutePath
+                toastMessage(getString(R.string.signature_saved))
+            } else {
+                toastMessage(getString(R.string.failed_to_save_signature))
+            }
+            dialog.dismiss()
+        }
+
+        closeImage.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -140,6 +187,31 @@ class EntryActivity : FlutterActivity() {
         outputStream.close()
         inputStream?.close()
         return file.absolutePath
+    }
+
+    private fun saveSignatureToCache(signatureBitmap: Bitmap): File? {
+        return try {
+            val fileName = getString(R.string.user_signature_)+System.currentTimeMillis()+".png"
+            val cacheDir = File(cacheDir, getString(R.string.signature))
+            if (!cacheDir.exists()) {
+                cacheDir.mkdirs()
+            }
+            val file = File(cacheDir, fileName)
+            val outputStream = FileOutputStream(file)
+
+            signatureBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            file
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun toastMessage(msg:String){
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
     }
 
     fun User.toMap(): Map<String, Any?> = mapOf(

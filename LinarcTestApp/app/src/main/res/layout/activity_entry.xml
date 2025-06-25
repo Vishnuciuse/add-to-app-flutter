@@ -86,6 +86,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mobileET" />
 
+    <Button
+        android:id="@+id/signBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/signature"
+        android:textAllCaps="false"
+        android:layout_margin="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mobileET" />
+
+    <ImageView
+        android:id="@+id/viewSignIV"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:contentDescription="@string/signature"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/signBtn"
+        app:layout_constraintStart_toEndOf="@+id/signBtn"
+        app:layout_constraintTop_toTopOf="@+id/signBtn" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/navMeBtn"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
