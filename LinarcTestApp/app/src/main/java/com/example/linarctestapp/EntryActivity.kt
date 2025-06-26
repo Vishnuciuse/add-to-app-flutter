@@ -1,15 +1,22 @@
 package com.example.linarctestapp
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +26,7 @@ import com.example.linarctestapp.data.UserViewModelFactory
 import com.example.linarctestapp.databinding.ActivityEntryBinding
 import com.example.linarctestapp.ui.custom.SignatureView
 import com.example.linarctestapp.utils.Constants
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
@@ -28,8 +36,12 @@ import java.io.FileOutputStream
 
 class EntryActivity : FlutterActivity() {
 
+    private val GALLERY_REQUEST_CODE = 101
+    private val CAMERA_REQUEST_CODE = 102
+    private val CAMERA_PERMISSION_CODE = 103
     private lateinit var binding: ActivityEntryBinding
     private lateinit var viewModel: UserViewModel
+    private lateinit var cameraImageFile: File
     var imageUri: String? = null
     var signUri: String? = null
 
@@ -58,7 +70,9 @@ class EntryActivity : FlutterActivity() {
         viewModel.insertComplete.observe(this) { isDone ->
             if (isDone) {
                 binding.uploadSIV.setImageDrawable(null)
+                binding.viewSignIV.setImageDrawable(null)
                 imageUri = null
+                signUri = null
                 binding.nameET.text?.clear()
                 binding.addressET.text?.clear()
                 binding.mobileET.text?.clear()
@@ -72,9 +86,7 @@ class EntryActivity : FlutterActivity() {
 
     private fun onClickListeners() {
         binding.uploadSIV.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = getString(R.string.image_mime_type)
-            startActivityForResult(intent, 101)
+            showBottomSheetDialog()
         }
 
         binding.signBtn.setOnClickListener {
@@ -118,7 +130,6 @@ class EntryActivity : FlutterActivity() {
             val signatureBitmap = signatureView.getSignatureBitmap()
             binding.viewSignIV.setImageBitmap(signatureBitmap)
             val file = saveSignatureToCache(signatureBitmap)
-            println("the sign uri@#$"+file!!.absolutePath.toString())
             if (file != null) {
                 signUri = file.absolutePath
                 toastMessage(getString(R.string.signature_saved))
@@ -137,10 +148,47 @@ class EntryActivity : FlutterActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 101 && resultCode == RESULT_OK && data?.data != null) {
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data?.data != null) {
             imageUri = copyUriToTempFile(this, data.data!!)
             val tempFilePath = Uri.fromFile(File(imageUri!!))
             binding.uploadSIV.setImageURI(tempFilePath)
+        }
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+            val tempFilePath = Uri.fromFile(cameraImageFile)
+            binding.uploadSIV.setImageURI(tempFilePath)
+            imageUri = cameraImageFile.absolutePath
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera()
+            } else {
+                toastMessage(getString(R.string.camera_permission_denied))
+                }
+        }
+    }
+
+    private fun checkPermissionAndOpenCamera() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_CODE
+            )
+        } else {
+            openCamera()
         }
     }
 
@@ -177,6 +225,44 @@ class EntryActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+    }
+
+    private fun openCamera() {
+        cameraImageFile = File.createTempFile(getString(R.string.user_photo), ".jpg", cacheDir)
+        val cameraImageUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", cameraImageFile)
+
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+            putExtra("android.intent.extras.CAMERA_FACING", 1)
+            putExtra("android.intent.extras.LENS_FACING_FRONT", 1)
+            putExtra("android.intent.extra.USE_FRONT_CAMERA", true)
+        }
+        startActivityForResult(intent, CAMERA_REQUEST_CODE)
+    }
+
+    private fun showBottomSheetDialog() {
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_layout, null)
+        dialog.setContentView(view)
+
+        val cameraTV = view.findViewById<TextView>(R.id.cameraTV)
+        val galleryTV = view.findViewById<TextView>(R.id.galleryTV)
+        val closeIV = view.findViewById<ImageView>(R.id.bottom_sheet_closeIV)
+        cameraTV.setOnClickListener {
+            checkPermissionAndOpenCamera()
+            dialog.dismiss()
+        }
+        galleryTV.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = getString(R.string.image_mime_type)
+            startActivityForResult(intent, GALLERY_REQUEST_CODE)
+            dialog.dismiss()
+        }
+        closeIV.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     fun copyUriToTempFile(context: Context, uri: Uri): String {

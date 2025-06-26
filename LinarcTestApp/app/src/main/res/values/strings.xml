@@ -22,4 +22,9 @@
     <string name="signature_saved">Signature saved</string>
     <string name="failed_to_save_signature">Failed to save signature</string>
     <string name="image">image_</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="upload_profile_picture">Upload profile picture</string>
+    <string name="camera_permission_denied">Camera permission denied</string>
+    <string name="user_photo">user_photo_</string>
 </resources>
